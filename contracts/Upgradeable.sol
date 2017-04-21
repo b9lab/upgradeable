@@ -14,21 +14,31 @@ pragma solidity ^0.4.8;
  * the same rules described above.
  */
 contract Upgradeable {
-/**
- * _sizes is a map of function signatures to return value sizes. Due to EVM
- * limitations, these need to be populated by the target contract, so the
- * dispatcher knows how many bytes of data to return from called functions.
- * Unfortunately, this makes variable-length return values impossible.
- */
+    /**
+     * _sizes is a map of function signatures to return value sizes. Due to EVM
+     * limitations, these need to be populated by the target contract, so the
+     * dispatcher knows how many bytes of data to return from called functions.
+     * Unfortunately, this makes variable-length return values impossible.
+     */
     mapping(bytes4 => uint) _sizes;
 
-/**
- * _dest is the address of the contract currently implementing all the
- * functionality of the composite contract. Contracts should update this by
- * calling the internal function `replace`, which updates _dest and calls
- * `initialize()` on the new contract.
- */
+    /**
+     * _dest is the address of the contract currently implementing all the
+     * functionality of the composite contract. Contracts should update this by
+     * calling the internal function `replace`, which updates _dest and calls
+     * `initialize()` on the new contract.
+     */
     address _dest;
+
+    /**
+     * _returnGasCost is what will be subtracted from the remaining gas to forward
+     * to the delegated execution.
+     */
+    uint _returnGasCost;
+
+    function Upgradeable() {
+        _returnGasCost = 10000;    	
+    }
 
     /**
      * This function is called using delegatecall from the dispatcher when the
@@ -42,6 +52,10 @@ contract Upgradeable {
      */
     function initialize();
     
+    function setReturnGasCost(uint newReturnGasCost) {
+        _returnGasCost = newReturnGasCost;
+    }
+
     /**
      * Performs a handover to a new implementing contract.
      */

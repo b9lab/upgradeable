@@ -4,6 +4,7 @@ const Promise = require("bluebird");
 const Dispatcher = artifacts.require("./Dispatcher.sol");
 const Counter = artifacts.require("./Counter.sol");
 const CounterDouble = artifacts.require("./CounterDouble.sol");
+const expectedException = require("../utils/expectedException.js");
 
 contract("Dispatcher", function(accounts) {
     let owner, counterImpl1, counterImpl2, dispatcher, counter;
@@ -88,6 +89,20 @@ contract("Dispatcher", function(accounts) {
                     return counter.getCounter();
                 })
                 .then(value => assert.strictEqual(value.toNumber(), 1));
+        });
+    });
+
+    describe("new gas cost", function() {
+        it("should fail if new gas cost is too low", function() {
+            return dispatcher.setReturnGasCost(42, { from: owner })
+                .then(txObject => expectedException(
+                    () => counter.increment({ from: owner, gas: 3000000 }),
+                    3000000));
+        });
+
+        it("should pass if new gas cost is enough", function() {
+            return dispatcher.setReturnGasCost(43, { from: owner })
+                .then(txObject => counter.increment({ from: owner }));
         });
     });
 });
