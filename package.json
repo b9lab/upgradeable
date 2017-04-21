@@ -1,0 +1,20 @@
+{
+  "name": "upgradeable",
+  "version": "1.0.0",
+  "description": "Example of an upgradeable contract",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "truffle": "./node_modules/.bin/truffle",
+    "testrpc": "./node_modules/.bin/testrpc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "ethereumjs-testrpc": "^3.0.3",
+    "truffle": "^3.2.1"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0"
+  }
+}

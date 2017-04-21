@@ -1,0 +1,22 @@
+{
+    // The number of spaces a tab is equal to. This setting is overriden based on the file contents when `editor.detectIndentation` is on.
+    "editor.tabSize": 4,
+    // Insert spaces when pressing Tab. This setting is overriden based on the file contents when `editor.detectIndentation` is on.
+    "editor.insertSpaces": true,
+    // When opening a file, `editor.tabSize` and `editor.insertSpaces` will be detected based on the file contents.
+    "editor.detectIndentation": false,
+    // Controls the indentation of wrapped lines. Can be one of 'none', 'same' or 'indent'.
+    "editor.wrappingIndent": "indent",
+    // Remove trailing auto inserted whitespace
+    "editor.trimAutoWhitespace": true,
+    "editor.rulers": [80,120],
+    "[javascript]": {
+        "editor.renderWhitespace": "all",
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true
+    },
+    // Defines space handling after function keyword for anonymous functions.
+    "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+    // Defines space handling after opening and before closing non empty brackets.
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBrackets": true
+}
