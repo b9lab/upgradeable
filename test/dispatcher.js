@@ -1,50 +1,49 @@
 "use strict";
 
-const Promise = require("bluebird");
 const Dispatcher = artifacts.require("./Dispatcher.sol");
 const Counter = artifacts.require("./Counter.sol");
 const CounterDouble = artifacts.require("./CounterDouble.sol");
 const expectedException = require("../utils/expectedException.js");
+const makeSureAreUnlocked = require("../utils/makeSureAreUnlocked.js");
+Promise.allSequential = require("../utils/sequentialPromise.js");
 
 contract("Dispatcher", function(accounts) {
     let owner, counterImpl1, counterImpl2, dispatcher, counter;
 
     before("should prepare accounts", function() {
+        assert.isAtLeast(accounts.length, 1);
         owner = accounts[ 0 ];
-        Promise.promisifyAll(web3.eth, { suffix: "Promise" });
-        Promise.promisifyAll(web3.currentProvider, { suffix: "Promise" });
+        return makeSureAreUnlocked([ owner ]);
     });
 
     beforeEach("should deploy 2 implementations and a dispatcher", function() {
-        return Counter.new({ from: owner })
-            .then(created => {
-                counterImpl1 = created;
-                return Dispatcher.new(counterImpl1.address, { from: owner })
+        return Promise.allSequential([
+                () => Counter.new({ from: owner }),
+                () => CounterDouble.new({ from: owner })
+            ])
+            .then(implementations => {
+                [ counterImpl1, counterImpl2 ] = implementations;
+                return Dispatcher.new(counterImpl1.address, { from: owner });
             })
             .then(created => {
                 dispatcher = created;
+                // Now we create the "pretend" counter.
                 counter = Counter.at(dispatcher.address);
-                return CounterDouble.new({ from: owner });
-            })
-            .then(created => counterImpl2 = created);
+            });
     });
 
     it("should work by forwarding, increment", function() {
         return counter.getCounter()
-            .then(value => {
-                assert.strictEqual(value.toNumber(), 0);
-                return counter.increment();
-            })
+            .then(value => assert.strictEqual(value.toNumber(), 0))
+            .then(() => counter.increment())
             .then(txObject => counter.getCounter())
             .then(value => assert.strictEqual(value.toNumber(), 1));
     });
 
     it("should work by forwarding, reset", function() {
         return counter.getCounter()
-            .then(value => {
-                assert.strictEqual(value.toNumber(), 0);
-                return counter.reset(3);
-            })
+            .then(value => assert.strictEqual(value.toNumber(), 0))
+            .then(() => counter.reset(3))
             .then(txObject => counter.getCounter())
             .then(value => assert.strictEqual(value.toNumber(), 3));
     });
@@ -52,10 +51,8 @@ contract("Dispatcher", function(accounts) {
     it("should change implementation", function() {
         return counter.increment({ from: owner })
             .then(txObject => counter.upgradeTo(counterImpl2.address))
-            .then(txObject => {
-                counter = CounterDouble.at(counter.address);
-                return counter.getCounterBefore();
-            })
+            .then(txObject => counter = CounterDouble.at(counter.address))
+            .then(() => counter.getCounterBefore())
             .then(value => assert.strictEqual(value.toNumber(), 1));
     });
 
@@ -69,10 +66,8 @@ contract("Dispatcher", function(accounts) {
         it("should use new implementation", function() {
             return counter.incrementMore({ from: owner })
                 .then(txObject => counter.getCounterBefore())
-                .then(value => {
-                    assert.strictEqual(value.toNumber(), 3);
-                    return counter.getCounter2();
-                })
+                .then(value => assert.strictEqual(value.toNumber(), 3))
+                .then(() => counter.getCounter2())
                 .then(value => assert.strictEqual(value.toNumber(), 4));
         });
 
@@ -84,10 +79,8 @@ contract("Dispatcher", function(accounts) {
 
         it("should be possible to upgrade to previous implementation", function() {
             return Counter.at(counter.address).upgradeTo(counterImpl1.address)
-                .then(txObject => {
-                    counter = Counter.at(counter.address);
-                    return counter.getCounter();
-                })
+                .then(txObject => counter = Counter.at(counter.address))
+                .then(() => counter.getCounter())
                 .then(value => assert.strictEqual(value.toNumber(), 1));
         });
     });
