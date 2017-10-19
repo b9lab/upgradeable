@@ -1,4 +1,4 @@
-pragma solidity ^0.4.8;
+pragma solidity ^0.4.10;
 
 contract Owned {
     address public owner;
@@ -8,16 +8,12 @@ contract Owned {
     }
 
     modifier fromOwner {
-        if (msg.sender != owner) {
-            throw;
-        }
+        require(msg.sender == owner);
         _;
     }
 
     function setOwner(address newOwner) fromOwner {
-        if (newOwner == 0) {
-            throw;
-        }
+        require(newOwner != 0);
         owner = newOwner;
     }
 }
