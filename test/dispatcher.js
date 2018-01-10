@@ -7,7 +7,7 @@ const expectedException = require("../utils/expectedException.js");
 const makeSureAreUnlocked = require("../utils/makeSureAreUnlocked.js");
 Promise.allSequential = require("../utils/sequentialPromise.js");
 
-contract("Dispatcher", function(accounts) {
+contract("Dispatcher with Counter", function(accounts) {
     let owner, counterImpl1, counterImpl2, dispatcher, counter;
 
     before("should prepare accounts", function() {
@@ -72,9 +72,8 @@ contract("Dispatcher", function(accounts) {
         });
 
         it("should not be possible to use old interface", function() {
-            return Counter.at(counter.address).getCounter()
-                // We just spied some random memory address
-                .then(value => assert.isAtLeast(Math.abs(value.toNumber()), 1000));
+            return expectedException(
+                () => Counter.at(counter.address).getCounter());
         });
 
         it("should be possible to upgrade to previous implementation", function() {

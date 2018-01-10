@@ -32,8 +32,14 @@ contract Dispatcher is OwnedUpgradeable {
         assembly {
             // return _dest.delegatecall(msg.data)
             calldatacopy(0x0, 0x0, calldatasize)
-            pop(delegatecall(gas, target, 0x0, calldatasize, 0, len))
-            return(0, len)
+            switch delegatecall(gas, target, 0x0, calldatasize, 0, len)
+            case 0 {
+                // Bubble failure up
+                revert(0, 32)
+            }
+            default {
+                return(0, len)
+            }
         }
     }
 }
