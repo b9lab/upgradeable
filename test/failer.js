@@ -15,7 +15,7 @@ contract("Dispatcher with Failer", function(accounts) {
         return makeSureAreUnlocked([ owner ]);
     });
 
-    beforeEach("should deploy 2 implementations and a dispatcher", function() {
+    beforeEach("should deploy an implementation and a dispatcher", function() {
         return Failer.new({ from: owner })
             .then(implementation => {
                 failerImpl = implementation;

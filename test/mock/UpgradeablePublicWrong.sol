@@ -17,7 +17,7 @@ contract UpgradeablePublicWrong is Upgradeable, Owned {
     }
 
     function initialize() {
-    	throw;
+    	revert();
     }
 
     function replacePublic(address target) returns (bool) {

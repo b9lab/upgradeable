@@ -20,7 +20,7 @@ contract Dispatcher is OwnedUpgradeable {
 
     function initialize() {
         // Should only be called by on target contracts, not on the dispatcher
-        throw;
+        revert();
     }
 
     function() {
