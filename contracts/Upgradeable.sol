@@ -1,4 +1,4 @@
-pragma solidity ^0.4.10;
+pragma solidity ^0.4.15;
 
 /**
  * Base contract that all upgradeable contracts should use.
@@ -30,14 +30,7 @@ contract Upgradeable {
      */
     address _dest;
 
-    /**
-     * _returnGasCost is what will be subtracted from the remaining gas to forward
-     * to the delegated execution.
-     */
-    uint _returnGasCost;
-
     function Upgradeable() {
-        _returnGasCost = 10000;    	
     }
 
     /**
@@ -52,10 +45,6 @@ contract Upgradeable {
      */
     function initialize();
     
-    function setReturnGasCost(uint newReturnGasCost) {
-        _returnGasCost = newReturnGasCost;
-    }
-
     /**
      * Performs a handover to a new implementing contract.
      */

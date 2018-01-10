@@ -84,18 +84,4 @@ contract("Dispatcher", function(accounts) {
                 .then(value => assert.strictEqual(value.toNumber(), 1));
         });
     });
-
-    describe("new gas cost", function() {
-        it("should fail if new gas cost is too low", function() {
-            return dispatcher.setReturnGasCost(42, { from: owner })
-                .then(txObject => expectedException(
-                    () => counter.increment({ from: owner, gas: 3000000 }),
-                    3000000));
-        });
-
-        it("should pass if new gas cost is enough", function() {
-            return dispatcher.setReturnGasCost(43, { from: owner })
-                .then(txObject => counter.increment({ from: owner }));
-        });
-    });
 });
